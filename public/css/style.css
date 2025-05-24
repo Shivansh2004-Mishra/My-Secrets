@@ -1,0 +1,38 @@
+html, body {
+    background-color: #e9ecef !important;
+    color: #000;
+    min-height: 100vh;
+}
+
+.centered{
+    padding: 200px;
+    text-align: center;
+}
+
+.secret-text{
+    text-align: center;
+    font-size: 2rem;
+    color: #E8ECEF;
+    background-color: #000;
+}
+
+.profile-icon {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #000; /* Black color */
+    z-index: 1000;
+    font-size: 2.5rem; /* Adjust size as needed */
+}
+.text{
+    text-align: center;
+    font-size: 2rem;
+    color: #000;
+}
+
+.jumbotron, .card, .container {
+    background-color: #e9ecef !important;
+    border: none;
+}
+
+
