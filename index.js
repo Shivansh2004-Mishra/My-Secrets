@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs= require('ejs');
@@ -12,9 +13,10 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 app.use(cookieParser());
+const PORT = process.env.PORT || 5000;
 
-
-mongoose.connect("mongodb://localhost:27017/secretsDB");
+// const mongoUrl = process.env.MONGO_URL_LOCAL // Uncomment this line if you want to use a local MongoDB instance
+const mongoUrl = process.env.MONGO_URL;
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -24,8 +26,17 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("seconds", userSchema);
 
-const JWT_SECRET = "your_jwt_secret"; // Use env variable in production
+const JWT_SECRET = process.env.JWT_SECRET;
 
+mongoose.connect(mongoUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    dbName: "secretsDB" // Optional: specify your DB name
+}).then(() => {
+    console.log("Connected to MongoDB Atlas");
+}).catch((err) => {
+    console.error("MongoDB connection error:", err);
+});
 
 app.get("/", function(req, res){
     res.render("home");
