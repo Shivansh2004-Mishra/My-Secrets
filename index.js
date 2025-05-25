@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     secrets: [String], // Change from 'secret: String' to 'secrets: [String]'
   
 });
-const User = mongoose.model("seconds", userSchema);
+const User = mongoose.model("User", userSchema);
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
