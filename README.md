@@ -118,5 +118,5 @@ This project is licensed for educational purposes.
 
 ## Author
 
-- [Your Name](https://github.com/Shivansh2004-Mishra)
+- [Shivansh Mishra](https://github.com/Shivansh2004-Mishra)
 
