@@ -45,8 +45,8 @@ app.post("/register", async function(req, res){
     if (!validateEmail(username)) {
         return res.send("Invalid email format.");
     }
-    if (!validatePassword(password)) {
-        return res.send("Password must be 6-8 characters, include uppercase, lowercase, and a number.");
+    if (!isValidPassword(password)) {
+        return res.send("Password must be 6-8 characters, include uppercase, lowercase, a number, and a special character.");
     }
     try {
         const hash = await bcrypt.hash(password, saltRounds);
@@ -129,9 +129,10 @@ app.post("/delete-secret", authenticateToken, async function(req, res){
 function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-function validatePassword(password) {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,8}$/.test(password);
-}
+ function isValidPassword(password) {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{6,8}$/.test(password);
+    }
+
 
 function authenticateToken(req, res, next) {
     const token = req.cookies.token;
