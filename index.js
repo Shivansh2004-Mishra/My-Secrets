@@ -42,19 +42,32 @@ app.get("/", function(req, res){
 // app.js registration route
 app.post("/register", async function(req, res){
     const { name, username, password } = req.body;
+
+    // Validate email format
     if (!validateEmail(username)) {
-        return res.send("Invalid email format.");
+        return res.status(400).send("❌ Invalid email format. Please enter a correct email.");
     }
+
+    // Validate password strength
     if (!isValidPassword(password)) {
-        return res.send("Password must be 6-8 characters, include uppercase, lowercase, a number, and a special character.");
+        return res.status(400).send("❌ Password must be 6-8 characters long and include uppercase, lowercase, a number, and a special character.");
     }
+
     try {
+        // Check if user already exists
+        const existingUser = await User.findOne({ email: username });
+        if (existingUser) {
+            return res.status(400).send("❌ Email already registered. Please use another email.");
+        }
+
+        // Hash the password and save user
         const hash = await bcrypt.hash(password, saltRounds);
         const newUser = new User({
             name: name,
             email: username,
             password: hash
         });
+
         await newUser.save();
         res.redirect("/login");
     } catch (err) {
@@ -62,24 +75,32 @@ app.post("/register", async function(req, res){
         res.redirect("/register");
     }
 });
+
+
 app.post("/login", async function(req, res){
     const { username, password } = req.body;
     if (!validateEmail(username)) {
-        return res.send("Invalid email format.");
+        return res.status(400).send("❌ Invalid email format. Please enter a correct email.");
     }
+
     try {
-        const foundUser = await User.findOne({email: username});
-        if (foundUser && await bcrypt.compare(password, foundUser.password)) {
-            const token = jwt.sign(
-                { id: foundUser._id, email: foundUser.email },
-                JWT_SECRET,
-                { expiresIn: '1h' }
-            );
-            res.cookie('token', token, { httpOnly: true, secure: false }); // set secure: true in production
-            res.redirect("/secrets");
-        } else {
-            res.send("Incorrect email or password");
+        const foundUser = await User.findOne({ email: username });
+
+        if (!foundUser) {
+            return res.status(401).send("❌ No account found with this email.");
         }
+
+        // Compare entered password with stored hash
+        const isMatch = await bcrypt.compare(password, foundUser.password);
+        if (!isMatch) {
+            return res.status(401).send("❌ Incorrect password. Please try again.");
+        }
+
+        // Generate token on successful login
+        const token = jwt.sign({ id: foundUser._id, email: foundUser.email }, JWT_SECRET, { expiresIn: '1h' });
+
+        res.cookie('token', token, { httpOnly: true, secure: false });
+        res.redirect("/secrets");
     } catch (err) {
         console.log(err);
         res.redirect("/login");
